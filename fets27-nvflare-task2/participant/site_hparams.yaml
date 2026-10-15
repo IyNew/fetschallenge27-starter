@@ -1,0 +1,13 @@
+cohorts:
+  brain_tumor:
+    defaults:
+      learning_rate: 0.0001
+      batch_size: 4
+      aggregation_epochs: 1
+      weight_decay: 0.00001
+      fedproxloss_mu: 0.0
+      cache_dataset: 0.0
+    sites:
+      site-0: {}
+      site-1:
+        learning_rate: 0.00008
