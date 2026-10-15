@@ -88,6 +88,10 @@ On Windows PowerShell:
 .\setup.ps1
 ```
 
+If you would rather not install the package (for example in a shared
+checkout), prefix every `python -m fets27_classification.cli ...` command with
+`PYTHONPATH=src `.
+
 ### 3. Prepare the baseline assets
 
 This writes the deterministic baseline checkpoint used by the simulator plus a
@@ -223,6 +227,19 @@ buffers from the parameter payload, which is required for clean weight-differenc
 (`TransferType.DIFF`) federation across heterogeneous sites. A BatchNorm variant
 is available to the centralized trainer for comparison.
 
+## NVFLARE Compatibility
+
+The runtime adapts to the installed NVFLARE recipe API. When `FedAvgRecipe`
+supports `per_site_config`, every simulated client receives its own resolved
+`train_args` (site datalist and hyperparameters). Older releases (for example
+2.7.0) accept only one shared `train_args` string; the locked client then
+resolves `<datalist_dir>/<site_name>.json` and this site's `site_hparams.yaml`
+overrides from the site name reported by the simulator, so per-site data and
+hyperparameters still apply. The recipe's `initial_ckpt`, `key_metric`, and
+`save_filename` arguments are used only when the installed release provides
+them; otherwise the locked checkpoint is loaded into the server model
+in-process and the evaluator falls back to `FL_global_model.pt`.
+
 ## Participant Workflow
 
 1. Edit `participant/aggregator.py` and/or `participant/client.py`
@@ -308,7 +325,7 @@ The function must return an NVFLARE `FLModel`:
   runner supplies the configured default when that key is omitted.
 - `metrics` may contain string-keyed, NVFLARE-serializable participant metrics.
   The locked runner always computes and overwrites the official
-  `val_balance_accuracy` and `val_*` metric values itself.
+  `val_balanced_accuracy` and `val_*` metric values itself.
 
 The organizer-owned runner retains control of `flare.init()`, `flare.receive()`,
 official validation, `flare.send()`, and the overall client lifecycle. The
