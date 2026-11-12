@@ -54,13 +54,13 @@ class SerializableSegResNet(SegResNet if SegResNet is not None else object):
         self.dropout_prob = dropout_prob
 
 
-class GliomaSegResNet(SerializableSegResNet):
-    """Specific SegResNet configuration used for glioma segmentation."""
+class BrainTumorSegResNet(SerializableSegResNet):
+    """Specific SegResNet configuration used for brain-tumor segmentation."""
 
     def __init__(self):
-        """Initialize the GliomaSegResNet model with preset hyperparameters."""
+        """Initialize the BrainTumorSegResNet model with preset hyperparameters."""
         super().__init__(
-            in_channels=4, out_channels=3, init_filters=8, dropout_prob=0.2
+            in_channels=4, out_channels=3, init_filters=40, dropout_prob=0.2
         )
 
 
@@ -129,11 +129,11 @@ class FedUNet(nn.Module if nn is not None else object):
 
 
 MODEL_CLASS_BY_COHORT = {
-    "glioma": GliomaSegResNet,
+    "brain_tumor": BrainTumorSegResNet,
 }
 
 MODEL_CLASS_BY_NAME = {
-    "glioma_segresnet": GliomaSegResNet,
+    "segresnet": BrainTumorSegResNet,
     "fedunet": FedUNet,
 }
 
@@ -144,7 +144,7 @@ def create_model_for_cohort(
     """Create a new model instance appropriate for the specified cohort.
 
     Args:
-        cohort_name: Name of the cohort (e.g. 'glioma').
+        cohort_name: Name of the cohort (e.g. 'brain_tumor').
         model_name: Optional explicit model name (e.g. 'fedunet'). When
             omitted, the cohort's locked default model is used.
 

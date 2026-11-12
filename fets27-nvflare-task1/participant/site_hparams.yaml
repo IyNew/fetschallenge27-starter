@@ -1,5 +1,5 @@
 cohorts:
-  glioma:
+  brain_tumor:
     defaults:
       learning_rate: 0.0001
       batch_size: 2
@@ -10,4 +10,4 @@ cohorts:
     sites:
       site-1: {}
       site-2:
-        learning_rate: 0.00008
+        learning_rate: 0.0001

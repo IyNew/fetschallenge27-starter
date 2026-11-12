@@ -31,7 +31,7 @@ def test_smoke_single_cohort_simulation():
     json_path, csv_path, cohort_scores = run_challenge(
         repo_root=REPO_ROOT,
         mode="local",
-        cohort_names=["glioma"],
+        cohort_names=["brain_tumor"],
         data_root=data_root,
         workspace_root=workspace_root,
         output_dir=output_dir,
@@ -42,7 +42,7 @@ def test_smoke_single_cohort_simulation():
     assert json_path.exists()
     assert csv_path.exists()
     assert len(cohort_scores) == 1
-    assert cohort_scores[0].cohort == "glioma"
+    assert cohort_scores[0].cohort == "brain_tumor"
 
 
 @pytest.mark.skipif(
@@ -58,7 +58,7 @@ def test_smoke_all_cohort_summary():
     json_path, csv_path, cohort_scores = run_challenge(
         repo_root=REPO_ROOT,
         mode="local",
-        cohort_names=["glioma"],
+        cohort_names=["brain_tumor"],
         data_root=data_root,
         workspace_root=workspace_root,
         output_dir=output_dir,
@@ -68,4 +68,4 @@ def test_smoke_all_cohort_summary():
 
     assert json_path.exists()
     assert csv_path.exists()
-    assert {score.cohort for score in cohort_scores} == {"glioma"}
+    assert {score.cohort for score in cohort_scores} == {"brain_tumor"}

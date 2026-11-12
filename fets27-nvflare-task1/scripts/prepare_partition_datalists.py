@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Build per-site glioma datalists from the FeTS 2027 Task 1 partition CSV.
+"""Build per-site brain-tumor datalists from the FeTS 2027 Task 1 partition CSV.
 
 This organizer-side helper reads ``Task1_Segmentation_Partition.csv`` (columns
 ``ID,Site_ID``), matches every listed case against a FeTS training tree, holds
 out a configurable number of labeled cases for validation, and writes the
 runtime layout consumed by ``run-local``/``run-official``:
 
-    <data-root>/glioma/datalist/site-<id>.json
-    <data-root>/glioma/datalist/site-All.json
-    <data-root>/glioma/dataset/SOURCE.txt   (absolute mode only)
+    <data-root>/brain_tumor/datalist/site-<id>.json
+    <data-root>/brain_tumor/datalist/site-All.json
+    <data-root>/brain_tumor/dataset/SOURCE.txt   (absolute mode only)
 
 Each site datalist holds that site's training cases plus a shared ``validation``
 list, so every simulated client evaluates the same held-out cases.
@@ -52,7 +52,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--data-root",
         type=Path,
         required=True,
-        help="Destination data root; writes <data-root>/glioma/datalist and dataset",
+        help="Destination data root; writes <data-root>/brain_tumor/datalist and dataset",
     )
     parser.add_argument(
         "--validation-count",
@@ -70,7 +70,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--file-mode",
         choices=["absolute", "copy"],
         default="absolute",
-        help="Reference source files in place or copy them into glioma/dataset",
+        help="Reference source files in place or copy them into brain_tumor/dataset",
     )
     return parser.parse_args(argv)
 
@@ -161,7 +161,7 @@ def build_layout(
     Args:
         partition_csv: CSV mapping case IDs to site IDs.
         training_dir: Directory containing the source case folders.
-        data_root: Destination data root for the ``glioma`` cohort.
+        data_root: Destination data root for the ``brain_tumor`` cohort.
         validation_count: Number of labeled cases held out for validation.
         modality_suffixes: Modality filename suffixes expected per case.
         file_mode: ``absolute`` to reference files in place or ``copy`` to copy them.
@@ -199,7 +199,7 @@ def build_layout(
     validation_ids = case_ids[-validation_count:]
     validation_set = set(validation_ids)
 
-    cohort_root = Path(data_root) / "glioma"
+    cohort_root = Path(data_root) / "brain_tumor"
     dataset_dir = cohort_root / "dataset"
     datalist_dir = cohort_root / "datalist"
     dataset_dir.mkdir(parents=True, exist_ok=True)

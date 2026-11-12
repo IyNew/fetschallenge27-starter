@@ -145,7 +145,7 @@ def _write_case(
     Args:
         image_path: Path where the image file should be written.
         label_path: Path where the label file should be written.
-        in_channels: The number of input channels (e.g. 4 for glioma).
+        in_channels: The number of input channels (e.g. 4 for the task).
         label_transform: The name of the label transform to configure synthetic structures.
         seed: Random seed for generating numpy random data.
     """

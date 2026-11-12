@@ -39,7 +39,7 @@ or the combined ranking score. That work is tracked in
 
 ## What This Repo Does
 
-- Runs federated training for the `glioma` cohort with the NVFLARE simulator
+- Runs federated training for the `brain_tumor` cohort with the NVFLARE simulator
 - Starts the server from a locked SegResNet baseline checkpoint
 - Loads the participant-defined server aggregator
 - Provides per-site default training hyperparameters to `local_train()`
@@ -102,7 +102,7 @@ python -m fets27_challenge.cli prepare-training-dummy \
   --data-root ./data/training_dummy
 ```
 
-By default this keeps the original NIfTI files in place and writes datalists under `data/training_dummy/glioma/datalist/`.
+By default this keeps the original NIfTI files in place and writes datalists under `data/training_dummy/brain_tumor/datalist/`.
 
 If you want to physically copy the dataset into this repo layout instead, add:
 
@@ -124,11 +124,11 @@ python scripts/prepare_partition_datalists.py \
   --validation-count 16
 ```
 
-This writes one `glioma/datalist/site-<id>.json` per partition site plus
+This writes one `brain_tumor/datalist/site-<id>.json` per partition site plus
 `site-All.json`, and holds out `--validation-count` labeled cases so every site
 shares the same local validation list. By default the datalists reference the
 source NIfTI files in place; add `--file-mode copy` to copy them into
-`data/fets2027/glioma/dataset/`. Because the released `validation/` split ships
+`data/fets2027/brain_tumor/dataset/`. Because the released `validation/` split ships
 without ground-truth masks, local validation is drawn from held-out training
 cases.
 
@@ -150,7 +150,7 @@ python -m fets27_challenge.cli run-local \
 Notes:
 
 - `--cohort` is optional and defaults to every registered cohort; the only
-  registered cohort is `glioma`, so the flag can be omitted.
+  registered cohort is `brain_tumor`, so the flag can be omitted.
 - `--gpu '[0],[1]'` maps one simulator client to GPU 0 and the other to GPU 1.
 - If you want CPU-only execution, omit `--gpu`.
 - With a single GPU and many partition sites, pass `--gpu 0 --threads 1` to run
@@ -166,37 +166,37 @@ The local run writes:
 
 - `outputs/training_dummy/local_summary.json`
 - `outputs/training_dummy/local_summary.csv`
-- `workspace/training_dummy/fets27_glioma/server/simulate_job/app_server/FL_global_model.pt`
+- `workspace/training_dummy/fets27_brain_tumor/server/simulate_job/app_server/FL_global_model.pt`
 
 TensorBoard logs are written under:
 
-- `workspace/training_dummy/fets27_glioma/server/simulate_job/tb_events`
+- `workspace/training_dummy/fets27_brain_tumor/server/simulate_job/tb_events`
 
 To watch a run while it is still training:
 
 ```bash
 tail -f \
-  workspace/training_dummy/fets27_glioma/site-1/log.txt \
-  workspace/training_dummy/fets27_glioma/site-2/log.txt
+  workspace/training_dummy/fets27_brain_tumor/site-1/log.txt \
+  workspace/training_dummy/fets27_brain_tumor/site-2/log.txt
 ```
 
 For a shorter progress-only view:
 
 ```bash
 grep -E "starting validation|validation complete|starting local training|step [0-9]+/|epoch .*complete|prepared update|sending update|Traceback|ERROR" \
-  workspace/training_dummy/fets27_glioma/site-*/log.txt
+  workspace/training_dummy/fets27_brain_tumor/site-*/log.txt
 ```
 
 Server-side NVFLARE logs are in:
 
 ```bash
-tail -f workspace/training_dummy/fets27_glioma/server/log.txt
+tail -f workspace/training_dummy/fets27_brain_tumor/server/log.txt
 ```
 
 You can also open TensorBoard:
 
 ```bash
-tensorboard --logdir workspace/training_dummy/fets27_glioma/server/simulate_job/tb_events --port 6006
+tensorboard --logdir workspace/training_dummy/fets27_brain_tumor/server/simulate_job/tb_events --port 6006
 ```
 
 Then open `http://localhost:6006`.
@@ -209,7 +209,7 @@ The runtime expects:
 
 ```text
 <data-root>/
-  glioma/
+  brain_tumor/
     dataset/
     datalist/
       site-1.json
@@ -224,7 +224,7 @@ are provided under `assets/sample_datalists/`.
 
 ## Segmentation Label Scheme
 
-FeTS 2027 glioma masks label the subregions as `1` = necrotic/non-enhancing
+FeTS 2027 Task 1 masks label the subregions as `1` = necrotic/non-enhancing
 tumor core (NCR), `2` = peritumoral edema (ED), and `3` = GD-enhancing tumor
 (ET). The earlier enhancing-tumor label `4` has been remapped to `3` across the
 training tree. The locked `brats_multi_channel` transform builds the TC/WT/ET
@@ -276,7 +276,7 @@ The official flow uses the same locked evaluator and score calculation as the pu
 The currently implemented segmentation evaluation reports:
 
 - Per cohort: mean validation Dice across participating sites using the best global checkpoint
-- Overall public score: the `glioma` validation Dice
+- Overall public score: the `brain_tumor` validation Dice
 
 The evaluator does not rely on TensorBoard summaries. It reloads the selected checkpoint and recomputes the score.
 

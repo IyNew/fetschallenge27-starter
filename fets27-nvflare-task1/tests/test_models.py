@@ -9,7 +9,7 @@ from monai.losses import DiceLoss  # noqa: E402
 
 from fets27_challenge.models import (  # noqa: E402
     FedUNet,
-    GliomaSegResNet,
+    BrainTumorSegResNet,
     create_model_for_cohort,
 )
 
@@ -59,13 +59,20 @@ def test_fedunet_small_batch_forward_backward():
     optimizer.step()
 
 
+def test_brain_tumor_segresnet_uses_40_filters():
+    model = BrainTumorSegResNet()
+
+    assert model.init_filters == 40
+    assert sum(parameter.numel() for parameter in model.parameters()) > 20_000_000
+
+
 def test_create_model_for_cohort_selects_fedunet():
-    model = create_model_for_cohort("glioma", model_name="fedunet")
+    model = create_model_for_cohort("brain_tumor", model_name="fedunet")
 
     assert isinstance(model, FedUNet)
-    assert isinstance(create_model_for_cohort("glioma"), GliomaSegResNet)
+    assert isinstance(create_model_for_cohort("brain_tumor"), BrainTumorSegResNet)
 
 
 def test_unknown_model_name_is_rejected():
     with pytest.raises(KeyError, match="Unknown model"):
-        create_model_for_cohort("glioma", model_name="unetr")
+        create_model_for_cohort("brain_tumor", model_name="unetr")

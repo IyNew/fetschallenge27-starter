@@ -51,7 +51,7 @@ def main(argv: list[str] | None = None):
 
     dummy_parser = subparsers.add_parser(
         "prepare-training-dummy",
-        help="Create a glioma data-root layout from FeTS training dummy folders",
+        help="Create a brain-tumor data-root layout from FeTS training dummy folders",
     )
     dummy_parser.add_argument("--source-root", type=Path, required=True)
     dummy_parser.add_argument("--data-root", type=Path, required=True)
@@ -61,7 +61,7 @@ def main(argv: list[str] | None = None):
         "--file-mode",
         choices=["absolute", "copy"],
         default="absolute",
-        help="Use absolute source paths in datalists or copy files into glioma/dataset",
+        help="Use absolute source paths in datalists or copy files into brain_tumor/dataset",
     )
 
     package_parser = subparsers.add_parser(

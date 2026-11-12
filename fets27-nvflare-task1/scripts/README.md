@@ -8,7 +8,7 @@ The main user-facing entrypoints live in:
 
 Organizer-side helpers in this folder:
 
-- `prepare_partition_datalists.py` - builds the runtime `<data-root>/glioma`
+- `prepare_partition_datalists.py` - builds the runtime `<data-root>/brain_tumor`
   layout from `Task1_Segmentation_Partition.csv`. It reads the `ID,Site_ID`
   partition, writes one `datalist/site-<id>.json` per site plus `site-All.json`,
   and holds out `--validation-count` labeled training cases as the shared local
@@ -22,7 +22,7 @@ Organizer-side helpers in this folder:
     --validation-count 16
   ```
 
-  Add `--file-mode copy` to copy NIfTI files into `glioma/dataset/` instead of
+  Add `--file-mode copy` to copy NIfTI files into `brain_tumor/dataset/` instead of
   referencing them in place.
 
 

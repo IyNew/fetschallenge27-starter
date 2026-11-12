@@ -26,7 +26,7 @@ def test_prepare_training_dummy_layout_writes_site_datalists():
         validation_count=1,
     )
 
-    datalist_dir = data_root / "glioma" / "datalist"
+    datalist_dir = data_root / "brain_tumor" / "datalist"
     site_1 = _read_json(datalist_dir / "site-1.json")
     site_2 = _read_json(datalist_dir / "site-2.json")
     site_all = _read_json(datalist_dir / "site-All.json")
@@ -40,7 +40,7 @@ def test_prepare_training_dummy_layout_writes_site_datalists():
     assert len(site_1["validation"]) == 1
     assert len(site_1["training"][0]["image"]) == 4
     assert site_1["training"][0]["label"].endswith("_seg.nii.gz")
-    assert (data_root / "glioma" / "dataset" / "SOURCE.txt").exists()
+    assert (data_root / "brain_tumor" / "dataset" / "SOURCE.txt").exists()
 
 
 def test_prepare_training_dummy_layout_can_copy_dataset_files():
@@ -58,12 +58,12 @@ def test_prepare_training_dummy_layout_can_copy_dataset_files():
         file_mode="copy",
     )
 
-    datalist = _read_json(data_root / "glioma" / "datalist" / "site-1.json")
+    datalist = _read_json(data_root / "brain_tumor" / "datalist" / "site-1.json")
     first_entry = datalist["training"][0]
     assert first_entry["image"][0] == "FeTS2022_00001/FeTS2022_00001_flair.nii.gz"
     assert (
         data_root
-        / "glioma"
+        / "brain_tumor"
         / "dataset"
         / "FeTS2022_00001"
         / "FeTS2022_00001_flair.nii.gz"
@@ -93,7 +93,7 @@ def test_prepare_training_dummy_cli_writes_runtime_layout(capsys):
 
     output = capsys.readouterr().out
     assert "Prepared training dummy layout" in output
-    datalist_dir = data_root / "glioma" / "datalist"
+    datalist_dir = data_root / "brain_tumor" / "datalist"
     assert (datalist_dir / "site-1.json").exists()
     assert (datalist_dir / "site-2.json").exists()
     assert (datalist_dir / "site-All.json").exists()
