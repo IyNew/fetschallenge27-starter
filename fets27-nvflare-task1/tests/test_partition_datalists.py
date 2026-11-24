@@ -60,7 +60,7 @@ def test_build_layout_partitions_by_csv_and_holds_out_validation():
         validation_count=1,
     )
 
-    datalist_dir = data_root / "glioma" / "datalist"
+    datalist_dir = data_root / "brain_tumor" / "datalist"
     site_1 = json.loads((datalist_dir / "site-1.json").read_text(encoding="utf-8"))
     site_2 = json.loads((datalist_dir / "site-2.json").read_text(encoding="utf-8"))
     site_all = json.loads((datalist_dir / "site-All.json").read_text(encoding="utf-8"))
@@ -74,7 +74,7 @@ def test_build_layout_partitions_by_csv_and_holds_out_validation():
     assert len(site_all["training"]) == 4
     assert len(site_1["training"][0]["image"]) == 4
     assert site_1["training"][0]["label"].endswith("_seg.nii.gz")
-    assert (data_root / "glioma" / "dataset" / "SOURCE.txt").exists()
+    assert (data_root / "brain_tumor" / "dataset" / "SOURCE.txt").exists()
 
 
 def test_build_layout_copy_mode_copies_case_files():
@@ -97,12 +97,12 @@ def test_build_layout_copy_mode_copies_case_files():
     )
 
     datalist = json.loads(
-        (data_root / "glioma" / "datalist" / "site-7.json").read_text(encoding="utf-8")
+        (data_root / "brain_tumor" / "datalist" / "site-7.json").read_text(encoding="utf-8")
     )
     first = datalist["training"][0]
     assert first["image"][0] == f"{case_ids[0]}/{case_ids[0]}_t1c.nii.gz"
     assert (
-        data_root / "glioma" / "dataset" / case_ids[0] / f"{case_ids[0]}_t1c.nii.gz"
+        data_root / "brain_tumor" / "dataset" / case_ids[0] / f"{case_ids[0]}_t1c.nii.gz"
     ).exists()
 
 

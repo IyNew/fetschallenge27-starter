@@ -30,7 +30,7 @@ def prepare_training_dummy_layout(
     validation_count: int = 2,
     file_mode: Literal["absolute", "copy"] = "absolute",
 ) -> dict:
-    """Write a runtime-compatible glioma data root from FeTS case folders.
+    """Write a runtime-compatible brain_tumor data root from FeTS case folders.
 
     This function discovers the cases in `source_root`, splits them into training and
     validation sets, partitions the training cases among a number of sites, and writes
@@ -73,7 +73,7 @@ def prepare_training_dummy_layout(
             f"holding out validation_count={validation_count}."
         )
 
-    cohort_root = data_root / "glioma"
+    cohort_root = data_root / "brain_tumor"
     dataset_dir = cohort_root / "dataset"
     datalist_dir = cohort_root / "datalist"
     dataset_dir.mkdir(parents=True, exist_ok=True)

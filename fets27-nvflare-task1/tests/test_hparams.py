@@ -19,13 +19,13 @@ from fets27_challenge.participant_config import (
 def test_load_site_hparams_accepts_sample_file():
     config = load_site_hparams(Path("participant/site_hparams.yaml"))
     assert "cohorts" in config
-    assert set(config["cohorts"]) == {"glioma"}
+    assert set(config["cohorts"]) == {"brain_tumor"}
 
 
 def test_invalid_key_rejected():
     bad_payload = {
         "cohorts": {
-            "glioma": {
+            "brain_tumor": {
                 "defaults": {
                     "learning_rate": 1e-4,
                     "batch_size": 1,
@@ -59,7 +59,7 @@ def test_invalid_key_rejected():
 )
 def test_invalid_hparam_value_rejected(key, value, message):
     config = load_site_hparams(Path("participant/site_hparams.yaml"))
-    config["cohorts"]["glioma"]["defaults"][key] = value
+    config["cohorts"]["brain_tumor"]["defaults"][key] = value
 
     with pytest.raises(ValueError, match=message):
         validate_site_hparams(config)
@@ -67,14 +67,14 @@ def test_invalid_hparam_value_rejected(key, value, message):
 
 def test_build_per_site_config_merges_defaults_and_site_overrides():
     config = load_site_hparams(Path("participant/site_hparams.yaml"))
-    cohort_spec = get_cohort_spec("glioma")
+    cohort_spec = get_cohort_spec("brain_tumor")
     per_site = build_per_site_config(
         config,
         cohort_spec,
-        dataset_base_dir=Path("D:/data/glioma/dataset"),
+        dataset_base_dir=Path("D:/data/brain_tumor/dataset"),
         site_datalist_paths={
-            "site-1": Path("D:/data/glioma/datalist/site-1.json"),
-            "site-2": Path("D:/data/glioma/datalist/site-2.json"),
+            "site-1": Path("D:/data/brain_tumor/datalist/site-1.json"),
+            "site-2": Path("D:/data/brain_tumor/datalist/site-2.json"),
         },
         data_loader_workers=3,
     )
@@ -88,19 +88,19 @@ def test_build_per_site_config_merges_defaults_and_site_overrides():
 
 def test_train_args_change_only_allowed_hparams():
     config = load_site_hparams(Path("participant/site_hparams.yaml"))
-    cohort_spec = get_cohort_spec("glioma")
+    cohort_spec = get_cohort_spec("brain_tumor")
     train_args = build_site_train_args(
         cohort_spec,
-        dataset_base_dir=Path("D:/data/glioma/dataset"),
-        datalist_json_path=Path("D:/data/glioma/datalist/site-2.json"),
+        dataset_base_dir=Path("D:/data/brain_tumor/dataset"),
+        datalist_json_path=Path("D:/data/brain_tumor/datalist/site-2.json"),
         participant_client_file=Path("participant/client.py"),
         hparams={
-            **config["cohorts"]["glioma"]["defaults"],
-            **config["cohorts"]["glioma"]["sites"]["site-2"],
+            **config["cohorts"]["brain_tumor"]["defaults"],
+            **config["cohorts"]["brain_tumor"]["sites"]["site-2"],
         },
     )
 
-    assert "--cohort glioma" in train_args
+    assert "--cohort brain_tumor" in train_args
     assert "--out_channels 3" in train_args
     assert "--batch_size 2" in train_args
     assert "--roi_size 128 128 128" in train_args
@@ -115,7 +115,7 @@ def test_train_args_change_only_allowed_hparams():
 
 def test_train_args_encode_paths_with_spaces_as_single_tokens():
     config = load_site_hparams(Path("participant/site_hparams.yaml"))
-    cohort_spec = get_cohort_spec("glioma")
+    cohort_spec = get_cohort_spec("brain_tumor")
     dataset_path = Path(".test-artifacts/path with spaces/dataset")
     datalist_path = Path(".test-artifacts/path with spaces/site-1.json")
     participant_path = Path(".test-artifacts/path with spaces/client.py")
@@ -125,7 +125,7 @@ def test_train_args_encode_paths_with_spaces_as_single_tokens():
         dataset_base_dir=dataset_path,
         datalist_json_path=datalist_path,
         participant_client_file=participant_path,
-        hparams=config["cohorts"]["glioma"]["defaults"],
+        hparams=config["cohorts"]["brain_tumor"]["defaults"],
     )
     tokens = train_args.split()
 

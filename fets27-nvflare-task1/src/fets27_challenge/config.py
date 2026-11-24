@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-COHORT_NAMES = ("glioma",)
+COHORT_NAMES = ("brain_tumor",)
 ALLOWED_HPARAM_KEYS = (
     "learning_rate",
     "batch_size",

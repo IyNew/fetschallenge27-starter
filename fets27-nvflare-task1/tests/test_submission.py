@@ -57,7 +57,7 @@ def test_validate_submission_rejects_locked_file_changes():
 def test_validate_submission_rejects_hparam_changes():
     repo_root = _make_repo(make_test_dir("submission-hparams-change"))
     (repo_root / "participant" / "site_hparams.yaml").write_text(
-        "cohorts:\n  glioma: {}\n", encoding="utf-8"
+        "cohorts:\n  brain_tumor: {}\n", encoding="utf-8"
     )
 
     with pytest.raises(ValueError, match="Modified locked files"):

@@ -58,16 +58,16 @@ class CohortSpec:
 
 
 COHORT_REGISTRY: dict[str, CohortSpec] = {
-    "glioma": CohortSpec(
-        name="glioma",
-        display_name="BraTS Glioma",
+    "brain_tumor": CohortSpec(
+        name="brain_tumor",
+        display_name="FeTS 2027 Brain Tumor",
         in_channels=4,
         out_channels=3,
         roi_size=(128, 128, 128),
-        infer_roi_size=(32, 32, 32),
+        infer_roi_size=(128, 128, 128),
         label_transform="brats_multi_channel",
-        model_wrapper="GliomaSegResNet",
-        checkpoint_relpath="assets/checkpoints/glioma_baseline.pt",
+        model_wrapper="BrainTumorSegResNet",
+        checkpoint_relpath="assets/checkpoints/brain_tumor_baseline.pt",
     ),
 }
 
@@ -76,7 +76,7 @@ def get_cohort_spec(cohort_name: str) -> CohortSpec:
     """Retrieve the CohortSpec details for a specific cohort.
 
     Args:
-        cohort_name: The name of the cohort (e.g., 'glioma').
+        cohort_name: The name of the cohort (e.g., 'brain_tumor').
 
     Returns:
         The matching CohortSpec.
