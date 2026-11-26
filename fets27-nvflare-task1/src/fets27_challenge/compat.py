@@ -30,3 +30,13 @@ class ModelAggregator:
         """
         raise RuntimeError(message)
 
+
+try:  # Prefer the real NVFLARE classes when NVFLARE is installed.
+    from nvflare.apis.fl_constant import FLMetaKey  # noqa: F811
+    from nvflare.app_common.abstract.fl_model import FLModel  # noqa: F811
+    from nvflare.app_common.aggregators.model_aggregator import (  # noqa: F811
+        ModelAggregator,
+    )
+except ModuleNotFoundError:  # pragma: no cover - no-NVFLARE test environments
+    pass
+

@@ -36,6 +36,8 @@ class CohortScore:
     best_model_path: str
     job_workspace: str
     site_scores: list[SiteScore]
+    final_round_score: float | None = None
+    best_model_source: str = "selector"
 
     def to_dict(self) -> dict:
         """Convert the CohortScore representation into a dictionary.
@@ -91,6 +93,19 @@ def resolve_best_model_path(
     raise FileNotFoundError(f"Unable to find a global checkpoint under {job_workspace}")
 
 
+def should_promote_final(selector_score: float, final_score: float) -> bool:
+    """Decide whether the final-round model should replace the selector's best.
+
+    Args:
+        selector_score: Cohort Dice of the selector-chosen best checkpoint.
+        final_score: Cohort Dice of the final aggregated global model.
+
+    Returns:
+        True when the final model outperforms the selector's best.
+    """
+    return final_score > selector_score
+
+
 def evaluate_best_checkpoint(
     cohort_spec: CohortSpec, *, data_root: Path, job_workspace: Path
 ) -> CohortScore:
@@ -104,10 +119,36 @@ def evaluate_best_checkpoint(
     Returns:
         A CohortScore instance containing site-level and aggregated dice scores.
     """
+    checkpoint_path = resolve_best_model_path(job_workspace)
+    return evaluate_checkpoint(
+        cohort_spec,
+        data_root=data_root,
+        checkpoint_path=checkpoint_path,
+        job_workspace=job_workspace,
+    )
+
+
+def evaluate_checkpoint(
+    cohort_spec: CohortSpec,
+    *,
+    data_root: Path,
+    checkpoint_path: Path,
+    job_workspace: Path | None = None,
+) -> CohortScore:
+    """Evaluate a specific checkpoint for a cohort across all site datalists.
+
+    Args:
+        cohort_spec: Specification details of the cohort to evaluate.
+        data_root: Path to the datasets' root.
+        checkpoint_path: Path to the checkpoint file to evaluate.
+        job_workspace: Optional NVFLARE job workspace path recorded on the score.
+
+    Returns:
+        A CohortScore instance containing site-level and aggregated dice scores.
+    """
     require_runtime_dependencies()
 
     torch = get_torch_module()
-    checkpoint_path = resolve_best_model_path(job_workspace)
     model = create_model_for_cohort(cohort_spec.name)
     state_dict = _load_state_dict(checkpoint_path)
     model.load_state_dict(state_dict, strict=True)
@@ -139,7 +180,7 @@ def evaluate_best_checkpoint(
         display_name=cohort_spec.display_name,
         cohort_score=float(cohort_score),
         best_model_path=str(checkpoint_path),
-        job_workspace=str(job_workspace),
+        job_workspace=str(job_workspace) if job_workspace is not None else "",
         site_scores=site_scores,
     )
 
@@ -186,6 +227,8 @@ def write_summary(
                 "val_dice",
                 "best_model_path",
                 "job_workspace",
+                "final_round_score",
+                "best_model_source",
             ],
         )
         writer.writeheader()
@@ -202,6 +245,8 @@ def write_summary(
                         "val_dice": site_score.val_dice,
                         "best_model_path": cohort_score.best_model_path,
                         "job_workspace": cohort_score.job_workspace,
+                        "final_round_score": cohort_score.final_round_score,
+                        "best_model_source": cohort_score.best_model_source,
                     }
                 )
     return json_path, csv_path

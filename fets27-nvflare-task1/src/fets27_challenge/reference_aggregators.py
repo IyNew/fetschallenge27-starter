@@ -47,8 +47,7 @@ class WeightedFedAvgAggregator(ModelAggregator):
             An FLModel containing the aggregated parameters.
         """
         if self.total_weight <= 0:
-            self.error("No accepted models are available.")
-            return FLModel(params={})
+            raise ValueError("No accepted models are available.")
         return FLModel(
             params={
                 key: value / self.total_weight
@@ -97,8 +96,7 @@ class MedianAggregator(ModelAggregator):
             An FLModel containing the aggregated median parameters.
         """
         if not self.client_models:
-            self.error("No accepted models are available.")
-            return FLModel(params={})
+            raise ValueError("No accepted models are available.")
 
         aggregated = {}
         for key in self.client_models[0]:
@@ -150,8 +148,7 @@ class ClippedMeanAggregator(ModelAggregator):
             An FLModel containing the clipped and averaged parameters.
         """
         if not self.client_models:
-            self.error("No accepted models are available.")
-            return FLModel(params={})
+            raise ValueError("No accepted models are available.")
 
         aggregated = {}
         for key in self.client_models[0]:

@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 from fets27_challenge.compat import FLMetaKey, FLModel
 from fets27_challenge.participant_loader import load_participant_aggregator
@@ -59,3 +60,39 @@ def test_participant_aggregator_loads_and_matches_contract():
     np.testing.assert_allclose(
         result.params["w"], np.array([2.5, 2.5], dtype=np.float32)
     )
+
+
+def test_reference_aggregators_are_nvflare_model_aggregators():
+    model_aggregator_module = pytest.importorskip(
+        "nvflare.app_common.aggregators.model_aggregator"
+    )
+
+    for aggregator_cls in (
+        WeightedFedAvgAggregator,
+        MedianAggregator,
+        ClippedMeanAggregator,
+    ):
+        assert isinstance(aggregator_cls(), model_aggregator_module.ModelAggregator)
+
+
+def test_fedavg_recipe_accepts_reference_aggregators():
+    torch = pytest.importorskip("torch")
+    fedavg_module = pytest.importorskip("nvflare.app_opt.pt.recipes.fedavg")
+
+    model = torch.nn.Linear(4, 2)
+    for aggregator_cls in (
+        WeightedFedAvgAggregator,
+        MedianAggregator,
+        ClippedMeanAggregator,
+    ):
+        aggregator = aggregator_cls()
+        recipe = fedavg_module.FedAvgRecipe(
+            name="test_reference_aggregator",
+            train_script="participant/client.py",
+            model=model,
+            aggregator=aggregator,
+            num_rounds=1,
+            min_clients=1,
+        )
+        assert recipe._get_model_aggregator() is aggregator
+

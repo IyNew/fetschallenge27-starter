@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import shutil
 import time
 from pathlib import Path
 
@@ -19,6 +20,8 @@ from .evaluation import (
     CohortScore,
     discover_site_datalists,
     evaluate_best_checkpoint,
+    evaluate_checkpoint,
+    should_promote_final,
     write_summary,
 )
 from .models import create_model_for_cohort
@@ -251,6 +254,43 @@ def run_single_cohort(
     score = evaluate_best_checkpoint(
         cohort_spec, data_root=data_root, job_workspace=job_workspace
     )
+    final_ckpts = sorted(job_workspace.rglob("FL_global_model.pt"))
+    if final_ckpts and final_ckpts[0].resolve() != Path(score.best_model_path).resolve():
+        final_score = evaluate_checkpoint(
+            cohort_spec,
+            data_root=data_root,
+            checkpoint_path=final_ckpts[0],
+            job_workspace=job_workspace,
+        )
+        score.final_round_score = final_score.cohort_score
+        if should_promote_final(score.cohort_score, final_score.cohort_score):
+            shutil.copy2(final_ckpts[0], score.best_model_path)
+            score.cohort_score = final_score.cohort_score
+            score.site_scores = final_score.site_scores
+            score.best_model_source = "final_round"
+        LOGGER.info(
+            "[server] final-round validation for cohort=%s: final=%.6f "
+            "selector_best=%.6f source=%s",
+            cohort_name,
+            final_score.cohort_score,
+            score.cohort_score,
+            score.best_model_source,
+        )
+    elif final_ckpts:
+        score.final_round_score = score.cohort_score
+        LOGGER.info(
+            "[server] final-round validation for cohort=%s: best checkpoint is "
+            "already the final model (score=%.6f)",
+            cohort_name,
+            score.cohort_score,
+        )
+    else:
+        LOGGER.warning(
+            "[server] final-round validation skipped for cohort=%s: no "
+            "FL_global_model.pt found under %s",
+            cohort_name,
+            job_workspace,
+        )
     LOGGER.info(
         "[server] evaluation complete for cohort=%s in %.1fs: score=%s",
         cohort_name,
